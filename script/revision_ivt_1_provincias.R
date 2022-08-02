@@ -2,13 +2,13 @@
 #la adscripcion de pacientes a los efectores que trabajan con el proyecto.
 #Estas tablas cuentan con registros de personas, sus datos personales y datos de
 #contacto. Como son datos sensibles, se quitaron del escript los links
-#de refencia.
-#En total se tenain mas o menos 150.000 registros por Cuatrimestre.
+#de referencia.
+#En total se tenían más o menos 150.000 registros por Cuatrimestre.
 
 
 
 # Librerías --------------------------------------------------------------------
-# Primero cargamos las Librerias que se utilizaran a lo largo del script
+# Primero cargamos las Librerías que se utilizaran a lo largo del script
 #install.packages("usethis")
 #install.packages("devtools")
 #install.packages("glue")
@@ -25,11 +25,11 @@ library(tidyverse)
 library(readxl)
 
 # Descarga----------------------------------------------------------------------
-#Se procede a descargar las bases del drive, se aprovecha aqui la libreria
+#Se procede a descargar las bases del drive, se aprovecha aquí la librería
 #googlesheets4 que nos permite interactuar con Googledrive directamente desde R.
 #En total son 24 tablas, una por cada provincia (y CABA).
 
-#hoja de links (esta talba cuenta con los links de los 24 registros delas provincias)
+#hoja de links (esta tabla cuenta con los links de los 24 registros delas provincias)
 while(TRUE){tabla_links <- try(
   read_sheet(ss = "...", 
              sheet="..."),T)
@@ -37,7 +37,7 @@ if(!is(tabla_links,'try-error')) break}
 
 links<- tabla_links$links
 
-#descargamos el CAI (Compromiso Anual de Gestion, se utiliza para revisiones mas adelante)----
+#descargamos el CAI (Compromiso Anual de Gestión, se utiliza para revisiones mas adelante)----
 while (TRUE) {cai_2021 <- try(
   read_sheet(ss = "...", 
              sheet="..."),T)
@@ -50,7 +50,7 @@ cai_2021_ivt_1<- cai_2021[cai_2021$IVT == 1,]
 #indiador 1----
 #descarga de las tablas del indicador 1
 
-#Para descargar las tablas se utilizara un loop while, anidado con un Try.
+#Para descargar las tablas se utilizará un loop while, anidado con un Try.
 #de esta manera, el loop no continua hasta que la enésima tabla se descargue
 #satisfactoriamente.
 
@@ -106,8 +106,8 @@ if(!is(aux_sabana,'try-error')) break}
 
 
 #revision ----
-#aqui se analizaran los datos y se realizara un dictamen del indicador.
-#1. revisión si efector forma parte del Compromiso Anual de Gestion. 
+#aqui se analizarán los datos y se realizara un dictamen del indicador.
+#1. revisión si efector forma parte del Compromiso Anual de Gestión. 
 revision_ivt_1<- ddjj_2021_03_ivt_1
 
 revision_ivt_1<- revision_ivt_1 %>% 
@@ -118,14 +118,16 @@ revision_ivt_1<- revision_ivt_1 %>%
   )
 
 #2. revisión campos obligatorios completos
-# revisamos que de lo cargado por la provincias no quede ningun campo obligatorio vacio.  
+# revisamos que de lo cargado por las provincias no quede ningún campo 
+# obligatorio vacío.  
+
 revision_ivt_1 <- 
   revision_ivt_1 %>% 
   mutate(check_campos_oblig_vacios = apply(
     revision_ivt_1[,-c(16,17)], 1, function(x) sum(is.na(x))))
 
 #3. revisión caso repetido
-# Se verifica que no haya mas de un registro por persona. 
+# Se verifica que no haya más de un registro por persona. 
 # de encontrarse duplicados, se les deja una marca ("si") y se le reporta a las 
 # provincias para que ella defina cual dejar declarado.
 aux_dup <- (duplicated(revision_ivt_1$nro_doc))
@@ -139,8 +141,8 @@ revision_ivt_1 <-
   )
   )
 
-#4.revision si el efector ya aprobó en la DDJJ anterior
-# se curza con la sabana descargada anteriormente.
+#4.revisión si el efector ya aprobó en la DDJJ anterior
+# se cruza con la sabana descargada anteriormente.
 revision_ivt_1 <- 
   revision_ivt_1 %>% 
   mutate(check_efector_aprobo_anteriormente = case_when(
@@ -151,8 +153,8 @@ revision_ivt_1 <-
 
 
 #5. fecha ultimos 12 meses
-#La adscripcion debe realizarse en los ultimos 12 meses para que se valide el
-#indicador
+# La adscripción debe realizarse en los últimos 12 meses para que se valide el
+# indicador
 
 revision_ivt_1 <- 
   revision_ivt_1 %>% 
@@ -164,7 +166,7 @@ revision_ivt_1 <-
 
 #6. revisión tipo de contacto
 # El tipo de contacto detallado debe de ser alguno de los que se detallan en el
-# vector acontinuacion.
+# vector acontinuación.
 aux_tipo_contacto <- c("Contacto con la persona en el efector",
                        "Contacto con la persona en su domicilio",
                        "Actividad extramuros del equipo",
@@ -182,7 +184,7 @@ revision_ivt_1 <-
 
 #7. revisión motivo de contacto da cuenta
 # El motivo de contacto detallado debe de ser alguno de los que se detallan en el
-# vector acontinuacion.
+# vector acontinuación.
 aux_motivo_contacto <- c("Consulta y/o control médico",
                          "Consulta o control enfermería",
                          "Vacunación",
@@ -204,13 +206,13 @@ revision_ivt_1 <-
   )
   )
 
-#8. Revision con Bases de Salud Familiar
-#entre la informacion detallada en los registrosse encuentra
-#el dato del profecional que realizo la adcripcion. Ese profecional tiene que 
-#ser parte de los equipos de salud validados por la 
-#Dirección Nacional de Atención Primaria y Salud Comunitaria.
-#Ellos nos pasan el listado de equipos para validar los cargados en los 
-#Registros. Cada equipo tiene un codigo unico cargado en el SISA.
+#8. Revisión con Bases de Salud Familiar
+# entre la información detallada en los registros se encuentra
+# el dato del profesional que realizo la adscripción. Ese profesional tiene que 
+# ser parte de los equipos de salud validados por la 
+# Dirección Nacional de Atención Primaria y Salud Comunitaria.
+# Ellos nos pasan el listado de equipos para validar los cargados en los 
+# Registros. Cada equipo tiene un código único cargado en el SISA.
 
 
 #carga de bases salud familiar
@@ -245,15 +247,16 @@ revision_ivt_1 <-
     TRUE ~ "negativo")
   )
 
-#optenido el dictamen de cada adscripcion, se relaizan tablas que resumen la
-#informacion para ser enviadas a las areas sustantivas del proyecto.
-#en base a esta informacion, se toman las deciciones del proyecto
+#optenido el dictamen de cada adscripción, se realizan tablas que resumen la
+#informacion para ser enviadas a las áreas sustantivas del proyecto.
+#en base a esta información, se toman las decisiones correspondientes.
 
-#division para la revision y negativos por region
-#Cada region tiene un consultor encargado. Los numeros que se ven ahi son los
+#division para la revisión y negativos por región
+#Cada región tiene un consultor encargado. Los números que se ven ahí son los
 #codigos INDEC de las distintas provincias.
-#Dividimos la informacion por region para cada consultor cuente con los suyo
+#Dividimos la información por región para cada consultor cuente con los suyo
 #para tomar las decisiones pertinentes.
+
 
 NOA<- c("38","66","10","90","86")
 NEA<- c("54","18","22","34")
@@ -276,7 +279,8 @@ revision_ivt_1_pata<- subset(revision_ivt_1,provincia_id %in% PATA)
 revision_ivt_1_na<- subset(revision_ivt_1,is.na(provincia_id))
 
 #Esta es una tabla adicional que cuenta con los registros duplicados.
-#Esto se reporta a la provincia para que tome la decicion de cual quedarse
+#Esto se reporta a la provincia para que tome la decisión de cual quedarse
+
 duplicados_ivt_1<- revision_ivt_1[revision_ivt_1$check_es_persona_duplicada=="si",]
 
 # guardamos la revision backup
@@ -385,12 +389,10 @@ write_sheet(data = revision_ivt_1_pata,
             sheet = "ivt_1")
 
 
-#subimos negativos al drive
-#suvimos la informacion a unos archivos en el drive. 
-#se crea un archivo por region y dentro del mismo, una solapa por provincia.
+# subimos negativos al drive
+# subimos la información a unos archivos en el drive. 
+# se crea un archivo por región y dentro del mismo, una solapa por provincia.
 
-##notaran que el loop se hace en vace a las provincias que aparecen en la base de revision y no en la de negativos.
-##esto es asi a proposito, de esta manera, cuando se corrigen todos los negativos, se sobre escribe la solapa por una totalmente en blanco
 for (i in unique(revision_ivt_1_cen$provincia)) {
   write_sheet(data = subset(negativos_ivt_1_cen,provincia == i),
               ss = "...",
