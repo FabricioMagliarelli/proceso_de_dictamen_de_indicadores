@@ -50,9 +50,9 @@ cai_2021_ivt_1<- cai_2021[cai_2021$IVT == 1,]
 #indiador 1----
 #descarga de las tablas del indicador 1
 
-#Para descargar las tablas se utilizará un loop while, anidado con un Try.
-#de esta manera, el loop no continua hasta que la enésima tabla se descargue
-#satisfactoriamente.
+# Para descargar las tablas se utilizará un loop while, anidado con un Try.
+# de esta manera, el script no se detiene si llega a haber un error en al descarga.
+# y continua intentando hasta que la tabla se descargue satisfactoriamente.
 
 ivt_1<- list()
 
